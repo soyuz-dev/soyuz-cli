@@ -16,7 +16,22 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(25)
+    jvmToolchain(21)
+}
+
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 21
+}
+
+tasks.processResources {
+    from("gradlew.bat") {
+        into("gradle-bootstrap")
+    }
+
+    from("gradle/wrapper") {
+        into("gradle-bootstrap/gradle/wrapper")
+    }
 }
 
 tasks.test {
@@ -25,4 +40,5 @@ tasks.test {
 
 application {
     mainClass = "org.soyuz.cli.MainKt"
+    applicationName = "soyuz"
 }

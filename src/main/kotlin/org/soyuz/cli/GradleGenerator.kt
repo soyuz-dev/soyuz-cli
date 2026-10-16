@@ -16,15 +16,12 @@ class GradleGenerator {
             else -> error("Unsupported Gradle project type: $type")
         }
 
-        val gradle = Path.of(
-            System.getProperty("user.dir"),
-            "gradlew.bat"
-        ).toAbsolutePath()
+        val gradle = GradleBootstrap.executable()
 
         Files.createDirectories(destination)
 
         val command = listOf(
-            gradle.toString(),
+            "cmd.exe", "/c", gradle.toString(),
             "init",
             "--type", gradleType,
             "--dsl", "kotlin",
