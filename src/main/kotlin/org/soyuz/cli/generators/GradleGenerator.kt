@@ -1,5 +1,7 @@
-package org.soyuz.cli
+package org.soyuz.cli.generators
 
+import org.soyuz.cli.GradleBootstrap
+import org.soyuz.cli.ProjectType
 import java.nio.file.Files
 import java.nio.file.Path
 

@@ -1,5 +1,4 @@
-
-package org.soyuz.cli
+package org.soyuz.cli.generators
 
 import java.nio.file.Path
 

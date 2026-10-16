@@ -7,6 +7,9 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
+import org.soyuz.cli.generators.AndroidGenerator
+import org.soyuz.cli.generators.GradleGenerator
+import org.soyuz.cli.generators.NextGenerator
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -25,13 +28,13 @@ class NewCommand : CliktCommand(name = "new") {
             ?: fail("Cannot determine project name")
 
         failIf(
-            type !in listOf(ProjectType.KOTLIN, ProjectType.JAVA, ProjectType.NEXT),
+            type !in listOf(
+                ProjectType.KOTLIN,
+                ProjectType.JAVA,
+                ProjectType.NEXT,
+                ProjectType.ANDROID
+            ),
             "Project type $type is not implemented yet"
-        )
-
-        failIf(
-            lib && type !in listOf(ProjectType.KOTLIN, ProjectType.JAVA),
-            "--lib is only supported for Kotlin and Java projects"
         )
 
         failIf(
@@ -58,6 +61,9 @@ class NewCommand : CliktCommand(name = "new") {
 
                 ProjectType.NEXT ->
                     NextGenerator().generate(destination)
+
+                ProjectType.ANDROID ->
+                    AndroidGenerator().generate(name, destination)
 
                 else -> fail("Unsupported project type: $type")
             }
