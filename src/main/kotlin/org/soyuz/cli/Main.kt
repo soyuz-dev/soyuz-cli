@@ -5,6 +5,13 @@ import com.github.ajalt.clikt.core.subcommands
 
 fun main(args: Array<String>) {
     Soyuz()
-        .subcommands(NewCommand())
+        .subcommands(
+            NewCommand(),
+            InitCommand().subcommands(
+                ReadmeCommand(),
+                LicenseCommand(),
+                GitignoreCommand()
+            )
+        )
         .main(args)
 }
