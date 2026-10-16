@@ -11,17 +11,6 @@ class ReadmeCommand : CliktCommand(name = "readme") {
     }
 }
 
-class LicenseCommand : CliktCommand(name = "license") {
-    private val type by option(
-        "--type",
-        help = "SPDX licence identifier"
-    )
-
-    override fun run() {
-        echo("Generating LICENSE (${type ?: "interactive"})")
-    }
-}
-
 class GitignoreCommand : CliktCommand(name = "gitignore") {
     override fun run() {
         echo("Generating .gitignore")

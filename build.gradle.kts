@@ -34,6 +34,16 @@ tasks.processResources {
     }
 }
 
+tasks.register<Sync>("installSoyuz") {
+    group = "distribution"
+    description = "installs the tool into your machine :)"
+
+    dependsOn(tasks.installDist)
+
+    from(tasks.installDist.map { it.destinationDir })
+    into("${System.getProperty("user.home")}/.local/share/soyuz")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
