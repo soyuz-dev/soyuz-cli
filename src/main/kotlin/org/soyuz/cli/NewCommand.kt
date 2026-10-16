@@ -1,3 +1,4 @@
+
 package org.soyuz.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -6,14 +7,17 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
-class NewCommand: CliktCommand(name = "new") {
+class NewCommand : CliktCommand(name = "new") {
     private val type by argument().enum<ProjectType>()
     private val target by argument().optional()
-    private val lib by option("--lib", help = "Generate a library instead of an application")
-        .flag()
+    private val lib by option(
+        "--lib",
+        help = "Generate a library instead of an application"
+    ).flag()
 
     override fun run() {
         val destination = resolveDestination(type, target)
@@ -21,22 +25,45 @@ class NewCommand: CliktCommand(name = "new") {
             ?: fail("Cannot determine project name")
 
         failIf(
-            Files.exists(destination) &&
-                    (!Files.isDirectory(destination) ||
-                            Files.list(destination).use { it.findAny().isPresent }),
-            "Destination is not an empty directory: $destination"
+            type !in listOf(ProjectType.KOTLIN, ProjectType.JAVA, ProjectType.NEXT),
+            "Project type $type is not implemented yet"
         )
 
         failIf(
-            type != ProjectType.KOTLIN && type != ProjectType.JAVA,
-            "Unsupported project type: $type"
+            lib && type !in listOf(ProjectType.KOTLIN, ProjectType.JAVA),
+            "--lib is only supported for Kotlin and Java projects"
         )
+
+        failIf(
+            Files.exists(destination) && (
+                    !Files.isDirectory(destination) ||
+                            Files.list(destination).use { it.findAny().isPresent }
+                    ),
+            "Destination is not an empty directory: $destination"
+        )
+
+        if (type == ProjectType.NEXT) {
+            failIf(
+                !Regex("[a-z0-9][a-z0-9._-]*").matches(name),
+                "Invalid Next.js project name: $name"
+            )
+        }
 
         echo("Creating project $name at $destination")
 
         try {
-            GradleGenerator().generate(type, name, destination, lib)
-        } catch (e: Exception) {
+            when (type) {
+                ProjectType.KOTLIN, ProjectType.JAVA ->
+                    GradleGenerator().generate(type, name, destination, lib)
+
+                ProjectType.NEXT ->
+                    NextGenerator().generate(destination)
+
+                else -> fail("Unsupported project type: $type")
+            }
+        } catch (e: IOException) {
+            fail("Project creation failed: ${e.message}")
+        } catch (e: IllegalStateException) {
             fail("Project creation failed: ${e.message}")
         }
 
@@ -54,8 +81,12 @@ class NewCommand: CliktCommand(name = "new") {
 
         val path = Path.of(target)
 
-        if (path.isAbsolute || path.nameCount > 1 ||
-            target.startsWith(".") || target.contains('\\') || target.contains('/')
+        if (
+            path.isAbsolute ||
+            path.nameCount > 1 ||
+            target.startsWith(".") ||
+            target.contains('\\') ||
+            target.contains('/')
         ) {
             return cwd.resolve(path).normalize()
         }
