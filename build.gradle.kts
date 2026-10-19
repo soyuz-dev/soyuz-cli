@@ -13,6 +13,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("com.github.ajalt.clikt:clikt:5.1.0")
+    implementation("com.varabyte.kotter:kotter:1.4.0")
 }
 
 kotlin {

@@ -10,8 +10,8 @@ fun main(args: Array<String>) {
             InitCommand().subcommands(
                 ReadmeCommand(),
                 LicenseCommand(),
-                GitignoreCommand()
-            )
+                GitignoreCommand(),
+            ),
         )
         .main(args)
 }
